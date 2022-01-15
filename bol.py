@@ -15,14 +15,18 @@ class GameSprite(sprite.Sprite):
 
 class Player(GameSprite):
     def update(self):
-        if keys_pressed[K_LEFT] and self.rect.x > 5:
-            self.rect.x -= self.speed
-        if keys_pressed[K_RIGHT] and self.rect.x < 595:
-            self.rect.x += self.speed
         if keys_pressed[K_UP] and self.rect.y > 5:
             self.rect.y -= self.speed
         if keys_pressed[K_DOWN] and self.rect.y < 395:
             self.rect.y += self.speed
+
+class Player2(GameSprite):
+    def update(self):
+        if keys_pressed[K_w] and self.rect.y > 5:
+            self.rect.y -= self.speed
+        if keys_pressed[K_s] and self.rect.y < 395:
+            self.rect.y += self.speed
+
 
 class Enemy(GameSprite):
     direction="left"
@@ -64,12 +68,15 @@ x2 = 550
 y2 = 250
 x3 = 550
 y3 = 400
+levo = 0
+pravo = 0
 
+'''wintext = font.render('Победа правого!',True, (255, 215, 0))
+losetext = font.render('Победа левого!',True, (255, 215, 0))'''
 
-
-sten1 = Player('sten.jpg', 100,100,5)
-sten2 = Player('sten.jpg', 100,100,5)
-pp = Enemy('pp.jpg', 500,300,2)
+sten1 = Player('sten.jpg', -55,200,5)
+sten2 = Player2('sten.jpg', 690,200,5)
+pp = Enemy('pp.png', 350,250,2)
 clock=time.Clock()
 FPS = 60
 
@@ -77,61 +84,92 @@ font.init()
 font = font.SysFont('Arial', 70)
 win2 = font.render('YOU WIN', True, (255, 215, 0))
 loos2 = font.render('Loos', True, (255, 64, 0))
-
+levogo=font.render('Счёт: '+ str(levo),True, (20, 255, 0))
+pravogo=font.render('Счёт; '+ str(pravo),True, (0, 255, 200))
 finish = False
 
 #задай фон сцены
 
+
+speed_x = 3
+speed_y = 3
+
+
 game= True
 while game:
-    window.blit(background,(0,0))
-    sten1.reset()
-    sten2.reset()
-    pp.reset()
 
 
-    keys_pressed = key.get_pressed()
-    if keys_pressed[K_LEFT] and x1 > 5:
-        x1 -= 10
-    if keys_pressed[K_RIGHT] and x1 < 595:
-        x1 += 10
-    if keys_pressed[K_UP] and y1 > 5:
-        y1 -= 10
-    if keys_pressed[K_DOWN] and y1 < 395:
-        y1 += 10
+    if finish != True:
+        pp.rect.x += speed_x
+        pp.rect.y += speed_y
+        
+        if pp.rect.y > 500-50 or pp.rect.y < 0:
+            speed_y *= -1
 
-    '''if keys_pressed[K_a] and x2 < 5:
-        x2 -= 10
-    if keys_pressed[K_d] and x2 < 595:
-        x2 += 10
-    if keys_pressed[K_w] and y2 < 5:
-        y2 -= 10
-    if keys_pressed[K_s] and y2 < 395:
-        y2 += 10
-    if x1==x2 and y1==y2'''
+        if sprite.collide_rect(sten2, pp) or sprite.collide_rect(sten1, pp):
+            speed_x *=-1
 
-    for e in event.get():
-        if e.type == QUIT:
-            game = False
+        if pp.rect.x < 0:
+            pp.rect.x= 350
+            pravo =+ 1
 
-        if finish != True:
 
-            '''if sprite.sprite.collide_rect(sten1, wall1) or sprite.collide_rect(sten2, wall2):
-                window.blit(loos2, (200, 200))
-                finish = True
-                loos.play()
+        if pp.rect.x > 700:
+            pp.rect.x= 350
+            levo =+ 1
 
-            if sprite.collide_rect(sten1, treasure):
-                windowblit(win2, (200, 200))
-                finish = True
-                win.play()'''
+        window.blit(background,(0,0))
+        sten1.reset()
+        sten2.reset()
+        pp.reset()
 
-    clock.tick(FPS)
-    sten1.update()
-    sten2.update()
-    pp.update()
-    display.update()
+
+        keys_pressed = key.get_pressed()
+        '''if keys_pressed[K_UP] and y1 > 5:
+            y1 -= 10
+        if keys_pressed[K_DOWN] and y1 < 395:
+            y1 += 10
+
+
+        if keys_pressed[K_w] and y2 < 5:
+            y2 -= 10
+        if keys_pressed[K_s] and y2 < 395:
+            y2 += 10
+        if x1==x2 and y1==y2'''
+
+        '''if count1 >= 51:
+            sleep(0.5)
+            window.blit(wintext, (250, 250))
+            finish = True
+        if count2 >= 11:
+            sleep(0.5)
+            window.blit(losetext, (250, 250))
+            finish = True'''
+
+        for e in event.get():
+            if e.type == QUIT:
+                game = False
+
+            if finish != True:
+
+                '''if sprite.sprite.collide_rect(sten1, wall1) or sprite.collide_rect(sten2, wall2):
+                    window.blit(loos2, (200, 200))
+                    finish = True
+                    loos.play()
+
+                if sprite.collide_rect(sten1, treasure):
+                    windowblit(win2, (200, 200))
+                    finish = True
+                    win.play()'''
+
+        clock.tick(FPS)
+        sten1.update()
+        sten2.update()
+        levogo=font.render('Счёт: '+ str(levo),True, (20, 255, 0))
+        pravogo=font.render('Счёт; '+ str(pravo),True, (0, 255, 200))
+        window.blit(levogo, (0, 0))
+        window.blit(pravogo, (500, 0))
+        display.update()
     
     
-
 
